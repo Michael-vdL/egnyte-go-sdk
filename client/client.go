@@ -5,73 +5,86 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
 
 const (
-  DefaultSubDomain = "demo" // Sample Testing Subdomain
-  DefaultEgnyteURL = "egnyte.com"
-  DefaultEgnyteAPIv1 = "/pubapi/v1/"
-  DefaultEgnyteAPIv2 ="/pubapi/v2/"
-  DefaultEgnyteAuthAPI = "/pubauth/token"
+	DefaultSubDomain     = "demo" // Sample Testing Subdomain
+	DefaultEgnyteURL     = "egnyte.com"
+	DefaultEgnyteAPIv1   = "/pubapi/v1/"
+	DefaultEgnyteAPIv2   = "/pubapi/v2/"
+	DefaultEgnyteAuthAPI = "/puboauth/token"
 )
 
 type Client struct {
-  BaseUrl string
-  APIVersion string
-  httpClient *http.Client
-  authToken string
+	BaseUrl    string
+	APIVersion string
+	httpClient *http.Client
+	authToken  string
 }
-
-
 
 func (c *Client) Authenticate(username, password, clientKey, clientSecret string) error {
-  authURL := fmt.Sprintf("%s%s", c.BaseUrl, DefaultEgnyteAuthAPI)
+	authURL := fmt.Sprintf("%s%s", c.BaseUrl, DefaultEgnyteAuthAPI)
 
-  authData := url.Values{}
-  authData.Set("grant_type", "password")
-  authData.Set("username", username)
-  authData.Set("password", password)
-  authData.Set("client_key", clientKey)
-  authData.Set("client_secret", clientSecret)
+	authData := url.Values{}
+	authData.Set("grant_type", "password")
+	authData.Set("username", username)
+	authData.Set("password", password)
+	authData.Set("client_id", clientKey)
+	authData.Set("client_secret", clientSecret)
 
+	req, err := http.NewRequest("POST", authURL, strings.NewReader(authData.Encode()))
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(authData.Encode())))
 
-  req, err := http.NewRequest("POST", authURL, strings.NewReader(authData.Encode()))
-  if err != nil {
-    return err
-  }
-  req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-  req.Header.Add("Content-Length", strconv.Itoa(len(authData.Encode())))
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return fmt.Errorf("authentication failed. status code: %d", res.StatusCode)
+	}
 
-  res, err := c.httpClient.Do(req)
-  if err != nil {
-    return err
-  }
-  defer res.Body.Close()
-  if res.StatusCode != 200 {
-    return fmt.Errorf("authentication failed. status code: %d", res.StatusCode)
-  }
+	var authResponse AuthResponse
+	err = json.NewDecoder(res.Body).Decode(&authResponse)
+	if err != nil {
+		return err
+	}
 
-  var authResponse AuthResponse
-  err = json.NewDecoder(req.Body).Decode(&authResponse)
-  if err != nil {
-    return err
-  }
+	c.authToken = authResponse.AccessToken
 
-  c.authToken = authResponse.AccessToken
-
-  return nil
+	return nil
 }
 
-
 func NewClient(subDomain, apiVersion string) *Client {
-  url := fmt.Sprintf("https://%s.%s", subDomain, DefaultEgnyteURL)
+	url := fmt.Sprintf("https://%s.%s", subDomain, DefaultEgnyteURL)
 
-  return &Client{
-    BaseUrl: url,
-    APIVersion: apiVersion,
-    httpClient: http.DefaultClient,
-    authToken: "",
-  }
+	return &Client{
+		BaseUrl:    url,
+		APIVersion: apiVersion,
+		httpClient: http.DefaultClient,
+		authToken:  "",
+	}
+}
+
+func ConfigurationFromFile(configFilePath string) (SDKConfig, error) {
+	var config SDKConfig
+	configFile, err := os.Open(configFilePath)
+	if err != nil {
+		return config, err
+	}
+	defer configFile.Close()
+
+	err = json.NewDecoder(configFile).Decode(&config)
+	if err != nil {
+		return config, err
+	}
+
+	return config, nil
 }

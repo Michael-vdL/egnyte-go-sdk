@@ -1,15 +1,27 @@
 package client
 
 /**
+  SDK Configuration
+*/
+
+type SDKConfig struct {
+	SubDomain  string `json:"subdomain"`
+	APIVersion string `json:"api_version"`
+	APIKey     string `json:"api_key"`
+	APISecret  string `json:"api_secret"`
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+}
+
+/**
   Authentication
 */
 
 type AuthResponse struct {
-  AccessToken string `json:"access_token"`
-  TokenType string `json:"token_type"`
-  ExpiresIn int `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
 }
-
 
 /**
   Events
@@ -18,34 +30,34 @@ type AuthResponse struct {
 */
 
 type Cursor struct {
-  Timestamp string `json:"timestamp"`
-  LatestEventId int `json:"latest_event_id"`
-  OldestEventId int `json:"oldest_event_id"`
+	Timestamp     string `json:"timestamp"`
+	LatestEventId int    `json:"latest_event_id"`
+	OldestEventId int    `json:"oldest_event_id"`
 }
 
 type Events struct {
-  Count int `json:"count"`
-  Events []Event `json:"events"`
-  LatestId int `json:"latest_id"`
-  OldestId int `json:"oldest_id"`
+	Count    int     `json:"count"`
+	Events   []Event `json:"events"`
+	LatestId int     `json:"latest_id"`
+	OldestId int     `json:"oldest_id"`
 }
 
 type Event struct {
-  Id int `json:"id"`
-  Timestamp string `json:"timestamp"`
-  Actor int `json:"actor"`
-  Type string `json:"type"`
-  Action string `json:"action"`
-  EventData EventData `json:"data"`
-  ActionSource string `json:"action_source"`
-  ObjectDetail string `json:"object_detail"`
+	Id           int       `json:"id"`
+	Timestamp    string    `json:"timestamp"`
+	Actor        int       `json:"actor"`
+	Type         string    `json:"type"`
+	Action       string    `json:"action"`
+	EventData    EventData `json:"data"`
+	ActionSource string    `json:"action_source"`
+	ObjectDetail string    `json:"object_detail"`
 }
 
 type EventData struct {
-  TargetPath string `json:"target_path"`
-  TargetId string `json:"target_id"`
-  TargetGroupId string `json:"target_group_id"`
-  IsFolder bool `json:"is_folder"`
+	TargetPath    string `json:"target_path"`
+	TargetId      string `json:"target_id"`
+	TargetGroupId string `json:"target_group_id"`
+	IsFolder      bool   `json:"is_folder"`
 }
 
 /**
