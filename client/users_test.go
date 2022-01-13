@@ -18,5 +18,4 @@ func Test_GetUsers(t *testing.T) {
   }
   
   t.Log(users)
- 
 }

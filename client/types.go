@@ -79,7 +79,7 @@ type Users struct {
 }
 
 type User struct {
-	ID                   string  `json:"id"`
+	ID                   int     `json:"id"`
 	UserName             string  `json:"userName"`
 	ExternalId           string  `json:"externalId"`
 	Name                 Name    `json:"name"`

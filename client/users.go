@@ -11,13 +11,15 @@ type UserClient struct {
 }
 
 func (c *UserClient) GetUsers() (*Users, error) {
-	usersUrl := fmt.Sprintf("%s/%s/users", c.BaseUrl, c.APIVersion)
+	usersUrl := fmt.Sprintf("%s%s/users", c.BaseUrl, c.APIVersion)
 
 	req, err := http.NewRequest("GET", usersUrl, nil)
   if err != nil {
     return nil, err
   }
-  req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.authToken))
+
+  authHeader := fmt.Sprintf("Bearer %s", c.authToken)
+  req.Header.Add("Authorization", authHeader)
 
   res, err := c.httpClient.Do(req)
   if err != nil {
