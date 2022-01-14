@@ -110,3 +110,10 @@ type Group struct {
 	DisplayName string `json:"displayName"`
 	Value       string `json:"value"`
 }
+
+// Folders
+
+type CreateFolderResponse struct {
+	Path string `json:"path"`
+	FolderId string `json:"folderId"`
+}
