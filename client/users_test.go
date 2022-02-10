@@ -12,12 +12,15 @@ func Test_GetUsers(t *testing.T) {
   uc := &UserClient{Client: *c}
 
   // Test
-  users, err := uc.GetUsers()
+  queryParameters := make(map[string]string)
+  queryParameters["count"] = "100"
+  users, err := uc.GetUsers(queryParameters)
   if err != nil {
     t.Errorf("GetUsers failed: %s", err)
   }
   
   t.Log(users)
+  t.Log(len(users.Resources))
 }
 
 func Test_GetUserById(t *testing.T) {
