@@ -22,3 +22,7 @@ After initial Events are defined, will work through remaining endpoints as neede
   - Cache user queries and maintain reference to them outside of API.
   - Call events API once every 5 minutes if possible.
   - Read https://developers.egnyte.com/docs
+
+# Tags
+
+- 0.1.3 User Query Paramets
