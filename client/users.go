@@ -10,12 +10,24 @@ type UserClient struct {
 	Client 
 }
 
-func (c *UserClient) GetUsers() (*Users, error) {
+/*
+  /users
+*/
+func (c *UserClient) GetUsers(params map[string]string) (*Users, error) {
 	usersUrl := fmt.Sprintf("%s%s/users", c.BaseUrl, c.APIVersion)
 
 	req, err := http.NewRequest("GET", usersUrl, nil)
   if err != nil {
     return nil, err
+  }
+
+  // Handle Query Parameters
+  if len(params) != 0 {
+    q := req.URL.Query()
+    for param, value := range params {
+      q.Add(param, value)
+    }
+    req.URL.RawQuery = q.Encode()
   }
 
   authHeader := fmt.Sprintf("Bearer %s", c.authToken)
@@ -39,6 +51,10 @@ func (c *UserClient) GetUsers() (*Users, error) {
 	return &users, nil
 }
 
+
+/* 
+  /users/id
+*/
 func (c *UserClient) GetUserById(userId string) (*User, error) {
   userByIdUrl := fmt.Sprintf("%s%s/users/%s", c.BaseUrl, c.APIVersion, userId)
   
